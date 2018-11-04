@@ -1,0 +1,87 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"> 
+<head> 
+<title>CIS 340 (Fall 2018) Project 4</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" /> 
+<link rel="STYLESHEET" href="../../class.css" type="text/css" /> 
+</head> 
+<body>
+
+<h4>Project4: A Customized Shell (Due at 11:59:59pm on 11/16/2016 (EDT))</h4>
+
+<h4 class="new"><a href="./group_p4.txt">Group Arrangment.</a></h4>
+
+<p>You are asked to implement a customized shell that supports Linux shell commands in addition to the internal commands.  You are expected to use C programming language.  
+Your implementation must work on Linux machine in FH133 lab.  </p>
+
+<h4> Required Modules: </h4>
+
+<ol>
+<li>(50 points) Your shell should repeatedly display a prompt and allow 
+the user to enter a command to run.  Your shell is supposed to read the input
+from system standard input, parse the line with command and arguments, and execute.
+You must use <tt>fork()</tt> and <tt>exec*()</tt> system calls.
+<ul>
+<li>Your shell should find the internal commands (see part2) first.  If not found, it 
+should search the directories in the shell's
+pathname environment (see part2).</li>
+<li>You are not allowed to use system(), as it invokes the system's /bin/sh shell.
+You should not use <tt>execlp()</tt> or <tt>execvp()</tt>, because your shell has its own path 
+variable (explained in part2).
+<li>By convention, the command arguments are seperated by white spaces.  Please
+describe your customized argument seperation rules in your README document 
+if you have special arrangement (not recommended though).  Your shell does not
+need to handle special characters.</li>
+</ul>
+</li>
+<li>(30 points) Implement the following three additional internal commands (running in the main
+process rather than the child process).
+<ul>
+<li><tt>cd</tt>: is a command, obviously, to change directories.  You are required to use the chdir system call.</li>
+<li><tt>path</tt>: is not only a command to show the current command searching pathnames 
+(if no argument is provided), but also a utility to modify (either add or remove) the 
+command searching pathnames.
+<ul>
+<li><tt>path (without arguments)</tt> displays the pathnames currently set.  e.g., "/bin:/sbin".  Initially, the pathnames are empty (so you have to manually use "path" command to construct your pathnames in the runtime.</li>
+<li><tt>path + /abc/def</tt> appends the pathname "/abc/def" to the "path" variable.  e.g., 
+"/bin:/sbin:/abc/def".</li>
+<li><tt>path - /abc/def</tt> removes the pathname "/abc/def" from the "path" variable.</li>
+</ul>
+</li>
+<li><tt>quit</tt>: is a command to leave the shell.</li>
+</ul>
+</li>
+<li>(5 points) Provide a Makefile so <tt>make</tt> command would produce the executable.</li>
+<li>
+(15 points) Readme: you are required to write a README document (TXT only) that
+describes your project design detail and the execution sequence (with the commands).
+In particular, please explicitly state which part, if there is any, does not work and 
+the possible reasons why that module does not work.  For those working modules, please give
+a brief (in short) sample output.
+</li>
+
+
+
+<br>
+<li><span style="text-decoration: underline;">Minimum Requirements<br>
+    </span>
+  <ul>
+    <li>Your shell supports all internal commands, including <tt>cd</tt>, <tt>path</tt>, and <tt>quit</tt>.</li>
+    <li>Once the pathnames are correctly set (by <tt>path</tt> command), your shell will be able to run any Linux shell commands.  Again, keep in mind that each command is supposed to run in the child process.</li>
+    <li>Your shell gives a meaningful response to an undefined command and wait for the next input.</li>
+ 		<li>Your program has a clean compile with no warning.</li>
+  </ul>
+
+</li>
+
+</ol>
+
+<h4>Submission:</h4>
+<ul>
+<li>Create a folder with the name of your assigned group name, e.g., Group_A.</li>
+<li>Copy all source code files/directories into the created folder.</li>
+<li>Include a group picture file (in JPG format) in your submission folder.</li>
+<li>Make sure you have sshed to grail.eecs.csuohio.edu, and then type:<br> 
+<tt> $ turnin -c cis340w -p proj4 Group_A</tt></li>
+</ul>
+</body>
+</hmtl>
