@@ -28,7 +28,8 @@ size_t parse_user_input(char *line, input_t *input){
     }
     return input_size;
 }
-int free_heap_mem(input_t *input){
+
+int free_input_mem(input_t *input){
     size_t i = 0;
     size_t tmp = input->args_c;
     for(i = 0; i < input->args_c; i++){
@@ -41,3 +42,117 @@ int free_heap_mem(input_t *input){
     return -1;
 }
 
+int free_path_mem(list_t *paths){
+    if( paths->count != 0){
+        while( paths->head != NULL ){
+            node_t *destroy = paths->head;
+            paths->head = paths->head->next;
+            free(destroy->path);
+            free(destroy);
+            paths->count--;
+        }
+        return 0;
+    }
+    return 0;
+}
+
+void display_path(list_t paths){
+    if( paths.head == NULL) {
+        printf("\n");
+    }
+    else if(paths.head->next == NULL){
+        printf("%s\n", paths.head->path);
+    } else{
+        for( node_t *node = paths.head; node != NULL; node = node->next){
+            if( node->next == NULL){
+                printf("%s\n", node->path);
+            } else{
+                printf("%s:", node->path);
+            }
+        }
+    }
+}
+
+int append_path(char *add, list_t *paths){
+    if( paths->count > 0){
+        node_t *node = paths->head;
+        do{
+            if( strcmp(node->path, add) == 0) {
+                printf("path already contains: %s\n", add);
+                return -1;
+            }
+            node = node->next;
+        } while(node != NULL);
+    }
+
+    if( paths->count == 0){
+        node_t *entry = calloc(1, sizeof(node_t));
+        if( entry != NULL){
+            char *size = calloc(strlen(add) + 1, sizeof(char));
+            if( size != NULL){
+                entry->path = size;
+                strcpy(entry->path, add);
+            }
+            entry->next = NULL;
+            paths->head = entry;
+            paths->tail = entry;
+            paths->count++;
+        }
+    } else {
+        node_t *entry = calloc(1, sizeof(node_t));
+        if( entry != NULL){
+            char *size = calloc(strlen(add) + 1, sizeof(char));
+            if( size != NULL){
+                entry->path = size;
+                strcpy(entry->path, add);
+                entry->next = NULL;
+                for(node_t *node = paths->head; node != NULL; node = node->next){
+                    if( node->next == NULL){
+                        node->next = entry;
+                        break;
+                    }
+                }
+                paths->tail = entry;
+                paths->count++;
+            }
+        }
+    }
+    return 0;
+}
+
+int remove_path(char *remove, list_t *paths){
+    if( paths->count == 1){
+        if( strcmp(paths->head->path, remove) == 0){
+            free(paths->head->path);
+            free(paths->head);
+            paths->head = NULL;
+            paths->tail = NULL;
+            paths->count--;
+        } else {
+            printf("path: %s not found\n", remove);
+            return -1;
+        }
+    }
+    if( paths->count > 1){
+        if( strcmp(paths->head->path, remove) == 0){
+            // remove first node
+            node_t *destroy = paths->head;
+            paths->head = paths->head->next;
+            free(destroy->path);
+            free(destroy);
+            paths->count--;
+        } else {
+            for (node_t *node = paths->head; node != NULL; node = node->next) {
+                if (strcmp(node->next->path, remove) == 0) {
+                    // remove node after current node
+                    node_t *destroy = node->next;
+                    node->next = node->next->next;
+                    free(destroy->path);
+                    free(destroy);
+                    break;
+                }
+            }
+        }
+    }
+    return 0;
+}
