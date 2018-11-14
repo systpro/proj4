@@ -27,7 +27,7 @@ int main() {
         }
 
         /// allocate array called input
-        input.args_v = (char **) calloc(input.args_c, sizeof(char *));
+        input.args_v = (char **) calloc(input.args_c + 1, sizeof(char *));
 
         /// place what the user entered into array called input
         parse_user_input(line, &input);
@@ -81,12 +81,26 @@ int main() {
                 else if( strncmp(input.args_v[1], "-", 1) == 0){
                     remove_path(input.args_v[2], &paths);
                 } else {
-                    printf("usage: %s, not a valid commad\n", input.args_v[1]);
+                    printf("usage: %s, not a valid command\n", input.args_v[1]);
                 }
             } else{
                 printf("usage: %s, must specify a path name\n", input.args_v[1]);
             }
 
+        }
+        //////////////
+        /// execute //
+        //////////////
+        else if(strlen(input.args_v[0])){
+            char *const *path_arr = paths_to_array(paths);
+            if(path_arr != NULL) {
+                if (execute(path_arr, input, paths) == 0) {
+                    printf("cool\n");
+                    free_input_mem(&input);
+                }else{
+                    free_path_arr(path_arr);
+                }
+            }
         }
         free_input_mem(&input);
     }

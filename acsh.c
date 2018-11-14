@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <tkPort.h>
+#include <sys/wait.h>
 
 #include "acsh.h"
 #include "structs.h"
@@ -17,7 +18,12 @@ size_t parse_user_input(char *line, input_t *input){
                 input->args_v[i] = temp;
                 input_size++;
             }
-
+            if(input->args_c == 1){
+                if(user_args[strlen(user_args)-1]== '\n'){
+                    user_args[strlen(user_args)-1] = '\0';
+                }
+                strncpy(input->args_v[i], user_args, strlen(user_args));
+            }
             strncpy(input->args_v[i], user_args, strlen(user_args));
             if( (i+2) == input->args_c){
                 user_args = strtok(NULL, "\n");
@@ -26,6 +32,7 @@ size_t parse_user_input(char *line, input_t *input){
             }
         }
     }
+    input->args_v[input_size]= (char *) 0;
     return input_size;
 }
 
@@ -54,6 +61,19 @@ int free_path_mem(list_t *paths){
         return 0;
     }
     return 0;
+}
+
+int free_path_arr(char **arr){
+    int i = 0;
+    for(; i < 2; i++){
+        free(arr[i]);
+    }
+    if(i == 2){
+        free(arr);
+        return 0;
+    } else{
+        return -1;
+    }
 }
 
 void display_path(list_t paths){
@@ -155,4 +175,55 @@ int remove_path(char *remove, list_t *paths){
         }
     }
     return 0;
+}
+char *const *paths_to_array(list_t paths){
+    char **path_array = calloc(2, sizeof(char*));
+    path_array[0] = calloc(sizeof(paths.head->path) + 6, sizeof(char));
+    strcpy(path_array[0], "PATH=");
+    strcat(path_array[0], paths.head->path);
+    int i = 1;
+    for(node_t *node = paths.head->next; node != NULL; node = node->next){
+        char *temp = realloc(path_array[0], sizeof(node->path));
+        if(temp != NULL){
+            path_array[0] = temp;
+            strcat(path_array[0], node->path);
+            i++;
+        }
+    }
+    if(i == paths.count){
+        path_array[1] = (char *) 0;
+        return path_array;
+    } else{ return  NULL;}
+}
+
+
+int execute(char *const *paths, input_t const input, list_t path_list){
+    int pid, status;
+    pid = fork();
+    switch(pid){
+        case -1:
+            perror("fork failed");
+            exit(1);
+        case 0:
+            // child process
+            // try each path in path_list to form command.
+            // existing bugs:
+            // does not load env. vars (e.g. echo $HOME), is this an issue?
+            // function logic follows the book example very closely, is this an issue?
+
+            for(node_t *node = path_list.head; node != NULL; node = node->next) {
+                size_t str_size = strlen(node->path) + strlen(input.args_v[0]) + 2;
+                char *command = calloc(str_size, sizeof(char));
+                strcpy(command, node->path);
+                strcat(command, "/");
+                strcat(command, input.args_v[0]);
+                execve(command, input.args_v, paths);
+            }
+            perror("execve failed");
+            exit(1);
+        default:
+            while (wait(&status) != pid){
+                return 0;
+            }
+    }
 }
