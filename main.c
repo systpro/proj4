@@ -93,7 +93,7 @@ int main() {
         else if(strlen(input.args_v[0])){
             if(paths.count != 0) {
                 if (execute(input, paths) == 0) {
-                    printf("cool\n");
+                    ;
                 }else{
                     printf("usage: %s, something's not right try again\n", input.args_v[0]);
                 }
