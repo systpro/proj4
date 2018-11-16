@@ -16,4 +16,5 @@ typedef struct{
     node_t *head;
     node_t *tail;
 } list_t;
+
 #endif //PROJ4_STRUCTS_H

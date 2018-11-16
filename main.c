@@ -55,12 +55,6 @@ int main() {
             else if( chdir(input.args_v[1]) < 0){
                 printf("chdir failed!\n");
             } else{
-                /// start debug
-                size_t size = 4096;
-                char buf[size];
-                getcwd(buf, size);
-                printf("cwd = %s\n", buf);
-                /// end debug
                 free_input_mem(&input);
                 continue;
             }
@@ -83,8 +77,11 @@ int main() {
                 } else {
                     printf("usage: %s, not a valid command\n", input.args_v[1]);
                 }
-            } else{
-                printf("usage: %s, must specify a path name\n", input.args_v[1]);
+            } else if ( input.args_c == 2) {
+                printf("usage: %s, try 'path [+][-] /foo/bar'\n", input.args_v[1]);
+            }
+            else{
+                printf("usage: %s, must specify a pathname\n", input.args_v[1]);
             }
 
         }
@@ -92,14 +89,14 @@ int main() {
         /// execute //
         //////////////
         else if(strlen(input.args_v[0])){
-            char *const *path_arr = paths_to_array(paths);
-            if(path_arr != NULL) {
-                if (execute(path_arr, input, paths) == 0) {
+            if(paths.count != 0) {
+                if (execute(input, paths) == 0) {
                     printf("cool\n");
-                    free_input_mem(&input);
                 }else{
-                    free_path_arr(path_arr);
+                    printf("usage: %s, something's not right try again\n", input.args_v[0]);
                 }
+            } else{
+                printf("usage: %s, must specify at least one path using path command\n", input.args_v[0]);
             }
         }
         free_input_mem(&input);

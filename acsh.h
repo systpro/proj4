@@ -15,10 +15,6 @@ int free_input_mem(input_t *input);
 /// Returns 0 if OK, -1 if error occurred.
 int free_path_mem(list_t *paths);
 
-/// Releases memory allocated to heap.
-/// Returns 0 if OK, -1 if error occurred.
-int free_path_arr(char **arr);
-
 /// Prints currently set path names to stdout
 void display_path(list_t paths);
 
@@ -30,12 +26,8 @@ int append_path(char *add, list_t *paths);
 /// Returns 0 if OK, -1 if error occurred.
 int remove_path(char *remove, list_t *paths);
 
-/// Convert the path linked list to an array of char*.
-/// Returns pointer to char array if OK.
-char *const *paths_to_array(list_t paths);
-
 /// Execute a user command.
 /// Does not return if OK, -1 if error occurred.
-int execute(char *const *paths, input_t input, list_t path_list);
+int execute(input_t input, list_t path_list);
 
 #endif //PROJ4_ACSH_H
