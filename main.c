@@ -1,5 +1,7 @@
 #include <stdio.h>
-#include <tkPort.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 #include "acsh.h"
 #include "structs.h"
