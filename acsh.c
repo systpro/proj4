@@ -1,6 +1,9 @@
 #include <stdio.h>
-#include <tkPort.h>
+#include <stdlib.h>
 #include <sys/wait.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <memory.h>
 
 #include "acsh.h"
 #include "structs.h"
