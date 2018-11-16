@@ -63,19 +63,6 @@ int free_path_mem(list_t *paths){
     return 0;
 }
 
-int free_path_arr(char **arr){
-    int i = 0;
-    for(; i < 2; i++){
-        free(arr[i]);
-    }
-    if(i == 2){
-        free(arr);
-        return 0;
-    } else{
-        return -1;
-    }
-}
-
 void display_path(list_t paths){
     if( paths.head == NULL) {
         printf("\n");
@@ -141,7 +128,12 @@ int append_path(char *add, list_t *paths){
 }
 
 int remove_path(char *remove, list_t *paths){
-    if( paths->count == 1){
+    size_t path_count = paths->count;
+    if( path_count == 0){
+        printf("path: %s not found\n", remove);
+    }
+    if( path_count == 1){
+        // only one path defined remove if strings match
         if( strcmp(paths->head->path, remove) == 0){
             free(paths->head->path);
             free(paths->head);
@@ -153,7 +145,7 @@ int remove_path(char *remove, list_t *paths){
             return -1;
         }
     }
-    if( paths->count > 1){
+    if( path_count > 1){
         if( strcmp(paths->head->path, remove) == 0){
             // remove first node
             node_t *destroy = paths->head;
@@ -169,35 +161,20 @@ int remove_path(char *remove, list_t *paths){
                     node->next = node->next->next;
                     free(destroy->path);
                     free(destroy);
+                    paths->count--;
                     break;
                 }
+            }
+            if(paths->count == path_count){
+                printf("path: %s not found\n", remove);
+                return -1;
             }
         }
     }
     return 0;
 }
-char *const *paths_to_array(list_t paths){
-    char **path_array = calloc(2, sizeof(char*));
-    path_array[0] = calloc(sizeof(paths.head->path) + 6, sizeof(char));
-    strcpy(path_array[0], "PATH=");
-    strcat(path_array[0], paths.head->path);
-    int i = 1;
-    for(node_t *node = paths.head->next; node != NULL; node = node->next){
-        char *temp = realloc(path_array[0], sizeof(node->path));
-        if(temp != NULL){
-            path_array[0] = temp;
-            strcat(path_array[0], node->path);
-            i++;
-        }
-    }
-    if(i == paths.count){
-        path_array[1] = (char *) 0;
-        return path_array;
-    } else{ return  NULL;}
-}
 
-
-int execute(char *const *paths, input_t const input, list_t path_list){
+int execute(input_t const input, list_t path_list){
     int pid, status;
     pid = fork();
     switch(pid){
@@ -208,7 +185,6 @@ int execute(char *const *paths, input_t const input, list_t path_list){
             // child process
             // try each path in path_list to form command.
             // existing bugs:
-            // does not load env. vars (e.g. echo $HOME), is this an issue?
             // function logic follows the book example very closely, is this an issue?
 
             for(node_t *node = path_list.head; node != NULL; node = node->next) {
@@ -217,13 +193,14 @@ int execute(char *const *paths, input_t const input, list_t path_list){
                 strcpy(command, node->path);
                 strcat(command, "/");
                 strcat(command, input.args_v[0]);
-                execve(command, input.args_v, paths);
+                execv(command, input.args_v);
             }
-            perror("execve failed");
+            perror("execv failed");
             exit(1);
         default:
             while (wait(&status) != pid){
                 return 0;
             }
     }
+    return 0;
 }
